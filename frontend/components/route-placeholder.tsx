@@ -5,9 +5,10 @@ type RoutePlaceholderProps = {
 
 export function RoutePlaceholder({ title, path }: RoutePlaceholderProps) {
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-heading">{title}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{path}</p>
-    </main>
+    <div className="mx-auto max-w-5xl rounded-xl border border-dashed border-border bg-surface p-8">
+      <h2 className="text-2xl font-semibold tracking-tight text-heading">{title}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">This section is a placeholder and will be implemented in a later phase.</p>
+      <p className="mt-1 text-xs text-muted-foreground">{path}</p>
+    </div>
   );
 }

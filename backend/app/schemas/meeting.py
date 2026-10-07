@@ -37,6 +37,8 @@ class MeetingResponse(BaseModel):
     summary: str | None
     created_at: datetime
     updated_at: datetime
+    action_item_total: int = 0
+    action_item_completed: int = 0
 
 
 class MeetingDetailResponse(MeetingResponse):

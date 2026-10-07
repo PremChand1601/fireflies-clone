@@ -44,17 +44,28 @@ def list_meetings(
         skip=skip,
         limit=limit,
     )
-    return MeetingListResponse(items=items, total=total)
+    counts = meeting_service.get_action_item_counts(db, [item.id for item in items])
+    return MeetingListResponse(
+        items=[
+            meeting_service.to_meeting_response(
+                item,
+                total=counts.get(item.id, (0, 0))[0],
+                completed=counts.get(item.id, (0, 0))[1],
+            )
+            for item in items
+        ],
+        total=total,
+    )
 
 
 @router.get("/{meeting_id}", response_model=MeetingDetailResponse)
 def get_meeting(meeting_id: int, db: Session = Depends(get_db)) -> MeetingDetailResponse:
-    return meeting_service.get_meeting(db, meeting_id)
+    return meeting_service.to_meeting_detail(meeting_service.get_meeting(db, meeting_id))
 
 
 @router.post("", response_model=MeetingDetailResponse, status_code=status.HTTP_201_CREATED)
 def create_meeting(payload: MeetingCreate, db: Session = Depends(get_db)) -> MeetingDetailResponse:
-    return meeting_service.create_meeting(db, payload)
+    return meeting_service.to_meeting_detail(meeting_service.create_meeting(db, payload))
 
 
 @router.put("/{meeting_id}", response_model=MeetingDetailResponse)
@@ -63,7 +74,7 @@ def update_meeting(
     payload: MeetingUpdate,
     db: Session = Depends(get_db),
 ) -> MeetingDetailResponse:
-    return meeting_service.update_meeting(db, meeting_id, payload)
+    return meeting_service.to_meeting_detail(meeting_service.update_meeting(db, meeting_id, payload))
 
 
 @router.delete("/{meeting_id}")

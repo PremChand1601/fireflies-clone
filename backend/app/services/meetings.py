@@ -2,11 +2,11 @@ from datetime import datetime
 from typing import Literal
 
 from fastapi import HTTPException, status
-from sqlalchemy import String, cast, func, or_, select
+from sqlalchemy import String, case, cast, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models import ActionItem, Chapter, Meeting, TranscriptSegment
-from app.schemas.meeting import MeetingCreate, MeetingUpdate
+from app.schemas.meeting import MeetingCreate, MeetingDetailResponse, MeetingResponse, MeetingUpdate
 
 SortOption = Literal["newest", "oldest", "title", "duration"]
 
@@ -170,3 +170,47 @@ def list_chapters(db: Session, meeting_id: int) -> list[Chapter]:
         .order_by(Chapter.start_time_seconds.asc())
     )
     return list(db.scalars(stmt).all())
+
+
+def get_action_item_counts(db: Session, meeting_ids: list[int]) -> dict[int, tuple[int, int]]:
+    if not meeting_ids:
+        return {}
+
+    stmt = (
+        select(
+            ActionItem.meeting_id,
+            func.count(ActionItem.id),
+            func.coalesce(func.sum(case((ActionItem.completed.is_(True), 1), else_=0)), 0),
+        )
+        .where(ActionItem.meeting_id.in_(meeting_ids))
+        .group_by(ActionItem.meeting_id)
+    )
+    rows = db.execute(stmt).all()
+    return {int(meeting_id): (int(total), int(completed)) for meeting_id, total, completed in rows}
+
+
+def to_meeting_response(meeting: Meeting, *, total: int = 0, completed: int = 0) -> MeetingResponse:
+    return MeetingResponse(
+        id=meeting.id,
+        title=meeting.title,
+        meeting_date=meeting.meeting_date,
+        duration_seconds=meeting.duration_seconds,
+        participants=list(meeting.participants or []),
+        summary=meeting.summary,
+        created_at=meeting.created_at,
+        updated_at=meeting.updated_at,
+        action_item_total=total,
+        action_item_completed=completed,
+    )
+
+
+def to_meeting_detail(meeting: Meeting) -> MeetingDetailResponse:
+    total = len(meeting.action_items)
+    completed = sum(1 for item in meeting.action_items if item.completed)
+    base = to_meeting_response(meeting, total=total, completed=completed)
+    return MeetingDetailResponse(
+        **base.model_dump(),
+        transcript_segments=meeting.transcript_segments,
+        action_items=meeting.action_items,
+        chapters=meeting.chapters,
+    )

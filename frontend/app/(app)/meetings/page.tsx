@@ -1,5 +1,12 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { Suspense } from "react";
+
+import { MeetingListSkeleton } from "@/components/meetings/meeting-list";
+import { MeetingsDashboard } from "@/components/meetings/meetings-dashboard";
 
 export default function MeetingsPage() {
-  return <RoutePlaceholder title="Meetings" path="/meetings" />;
+  return (
+    <Suspense fallback={<MeetingListSkeleton />}>
+      <MeetingsDashboard />
+    </Suspense>
+  );
 }
