@@ -16,7 +16,9 @@ from app.schemas.meeting import (
 )
 from app.schemas.transcript import TranscriptSegmentResponse
 from app.services import action_items as action_item_service
+from app.services import chapters as chapter_service
 from app.services import meetings as meeting_service
+from app.services import transcripts as transcript_service
 
 router = APIRouter(prefix="/api/meetings", tags=["meetings"])
 
@@ -85,12 +87,15 @@ def delete_meeting(meeting_id: int, db: Session = Depends(get_db)) -> dict[str, 
 
 @router.get("/{meeting_id}/transcript", response_model=list[TranscriptSegmentResponse])
 def get_transcript(meeting_id: int, db: Session = Depends(get_db)) -> list[TranscriptSegmentResponse]:
-    return meeting_service.list_transcript(db, meeting_id)
+    return transcript_service.list_transcript(db, meeting_id)
 
 
 @router.get("/{meeting_id}/action-items", response_model=list[ActionItemResponse])
-def get_action_items(meeting_id: int, db: Session = Depends(get_db)) -> list[ActionItemResponse]:
-    return meeting_service.list_action_items(db, meeting_id)
+def get_action_items(
+    meeting_id: int,
+    db: Session = Depends(get_db),
+) -> list[ActionItemResponse]:
+    return action_item_service.list_action_items(db, meeting_id)
 
 
 @router.post(
@@ -108,4 +113,4 @@ def create_action_item(
 
 @router.get("/{meeting_id}/chapters", response_model=list[ChapterResponse])
 def get_chapters(meeting_id: int, db: Session = Depends(get_db)) -> list[ChapterResponse]:
-    return meeting_service.list_chapters(db, meeting_id)
+    return chapter_service.list_chapters(db, meeting_id)
