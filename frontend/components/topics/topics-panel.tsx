@@ -162,7 +162,7 @@ export function TopicsPanel({ meetingId, currentTime, seek }: TopicsPanelProps) 
                     ) : null}
                     {chapter.keywords.length > 0 ? (
                       <span className="mt-2.5 flex flex-wrap gap-1.5">
-                        {chapter.keywords.map((keyword, keywordIndex) => (
+                        {chapter.keywords.map((keyword: string, keywordIndex: number) => (
                           <span
                             className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[10px] font-medium text-slate-500"
                             key={`${keyword}-${keywordIndex}`}

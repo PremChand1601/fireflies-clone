@@ -146,32 +146,6 @@ def delete_meeting(db: Session, meeting_id: int) -> int:
     return meeting_id
 
 
-def list_transcript(db: Session, meeting_id: int) -> list[TranscriptSegment]:
-    _meeting_or_404(db, meeting_id)
-    stmt = (
-        select(TranscriptSegment)
-        .where(TranscriptSegment.meeting_id == meeting_id)
-        .order_by(TranscriptSegment.sequence.asc())
-    )
-    return list(db.scalars(stmt).all())
-
-
-def list_action_items(db: Session, meeting_id: int) -> list[ActionItem]:
-    _meeting_or_404(db, meeting_id)
-    stmt = select(ActionItem).where(ActionItem.meeting_id == meeting_id).order_by(ActionItem.id.asc())
-    return list(db.scalars(stmt).all())
-
-
-def list_chapters(db: Session, meeting_id: int) -> list[Chapter]:
-    _meeting_or_404(db, meeting_id)
-    stmt = (
-        select(Chapter)
-        .where(Chapter.meeting_id == meeting_id)
-        .order_by(Chapter.start_time_seconds.asc())
-    )
-    return list(db.scalars(stmt).all())
-
-
 def get_action_item_counts(db: Session, meeting_ids: list[int]) -> dict[int, tuple[int, int]]:
     if not meeting_ids:
         return {}

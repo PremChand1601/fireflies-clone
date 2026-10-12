@@ -20,11 +20,16 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ActionItemsPanel } from "@/components/meetings/action-items-panel";
+import { ActionItemsPanel } from "@/components/action-items/action-items-panel";
 import { MeetingActions } from "@/components/meetings/meeting-actions";
 import { MeetingPlayer } from "@/components/meetings/meeting-player";
-import { TopicsPanel } from "@/components/meetings/topics-panel";
-import { useMeeting, useMeetingTranscript, MeetingsApiError } from "@/hooks/use-meetings";
+import { TopicsPanel } from "@/components/topics/topics-panel";
+import {
+  useMeeting,
+  useMeetingTranscript,
+} from "@/hooks/use-meetings";
+
+import { MeetingsApiError } from "@/lib/api/meetings";
 import { usePlayer } from "@/hooks/use-player";
 import type { MeetingDetail as MeetingDetailData, TranscriptSegment } from "@/types";
 
